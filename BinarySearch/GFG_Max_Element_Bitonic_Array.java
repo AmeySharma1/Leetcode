@@ -68,6 +68,10 @@
  * Binary Search on Answer / Peak Element
  */
 
+
+
+//.If we need to find minimum element in bitonic array: just return min of 1st element and last element.
+
 class Solution {
     public int findMaximum(int[] arr) {
 
