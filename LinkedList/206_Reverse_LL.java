@@ -110,3 +110,29 @@ class Solution {
         return prev; // new head
     }
 }
+
+/*
+ * Recursive Idea:
+ * - Pehle rest of the list reverse karo
+ * - Fir current node ko last me attach karo
+ */
+
+class Solution {
+    public ListNode reverseList(ListNode head) {
+
+        // Base Case
+        if (head == null || head.next == null) {
+            return head;
+        }
+
+        // Reverse remaining list
+        ListNode reversed = reverseList(head.next);
+
+        // Fix current node
+        head.next.next = head;
+        head.next = null;
+
+        return reversed;
+    }
+}
+
