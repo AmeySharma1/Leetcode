@@ -178,7 +178,7 @@ class Solution {
             }
         }
 
-        res += sign * curr;
+        res += sign * curr;   // this is important for handling case if string ends with a number instead of ')'
         return res;
     }
 }
