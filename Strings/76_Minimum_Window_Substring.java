@@ -9,95 +9,67 @@
  * - Hume s ka smallest substring find karna hai
  *   jo t ke saare characters contain kare
  *
- * - Characters ki frequency bhi important hai
- *
- * Example:
- *
- * s = "ADOBECODEBANC"
- * t = "ABC"
- *
- * Output:
- * "BANC"
+ * - Frequency of characters bhi maintain karni hogi
  *
  * ----------------------------------------------------
  * Key Observation:
  *
- * - Hume smallest window find karna hai jisme
- *   t ke saare characters exist karein
- *
- * - Sliding Window technique perfect hai
- *
- * - Window expand karte hain jab tak required characters mil na jaye
- * - Fir window shrink karke minimum size find karte hain
+ * - Sliding Window technique use karte hain
+ * - Window expand karte hain using right pointer
+ * - Jab valid window mil jaye (saare characters present)
+ *   to window shrink karke minimum window detect karte hain
  *
  * ----------------------------------------------------
- * Approach: Sliding Window + Frequency Array
+ * Approach: Sliding Window + Two Frequency Arrays
  *
- * - Ek frequency array use karte hain
- *   jo t ke characters ki count store karta hai
+ * Do arrays use karte hain:
  *
- * - requiredCount track karta hai
- *   ki kitne characters abhi match hone baaki hain
+ * mapT → t ke characters ki required frequency
+ * mapS → current window ki frequency
  *
- * Window Expansion:
- * - right pointer window expand karega
- *
- * Window Shrinking:
- * - jab saare characters mil jaye
- *   left pointer se window shrink karte hain
+ * contains(mapS, mapT) function check karta hai:
+ * - kya current window t ke saare characters contain karta hai
  *
  * ----------------------------------------------------
  * Algorithm:
  *
- * 1. Edge case:
- *      agar t.length > s.length
- *      return ""
+ * 1. Create two arrays:
+ *      mapS[256]
+ *      mapT[256]
  *
- * 2. Frequency array create karo:
- *      int freq[128]
+ * 2. t ke characters ki frequency mapT me store karo
  *
- * 3. t ke characters ka frequency store karo
+ * 3. Initialize pointers:
+ *      left = 0
+ *      right = 0
  *
- * 4. Initialize:
- *      requiredCount = t.length
- *      i = 0 (left pointer)
- *      j = 0 (right pointer)
- *      minWindowSize = ∞
- *      start = 0
+ * 4. Track:
+ *      minLen = ∞
+ *      minStart = 0
  *
- * 5. Traverse s using j pointer:
+ * 5. Traverse string using right pointer:
  *
- *      char ch = s[j]
+ *      mapS[s[right]]++
  *
- *      agar freq[ch] > 0
- *          requiredCount--
+ * 6. Jab current window valid ho:
+ *      contains(mapS, mapT) == true
  *
- *      freq[ch]--
+ *      windowSize = right - left + 1
  *
- * 6. Jab requiredCount == 0
- *      matlab valid window mil gaya
- *
- *      windowSize = j - i + 1
- *
- *      agar windowSize < minWindowSize
- *          update minWindowSize
- *          update start
+ *      agar windowSize < minLen
+ *          update minLen
+ *          update minStart
  *
  * 7. Window shrink karo:
  *
- *      leftChar = s[i]
+ *      mapS[s[left]]--
+ *      left++
  *
- *      freq[leftChar]++
- *
- *      agar freq[leftChar] > 0
- *          requiredCount++
- *
- *      i++
- *
- * 8. j++ karke window expand karte raho
+ * 8. Continue until right pointer end tak na pahunch jaye
  *
  * 9. End me:
- *      agar minWindowSize update nahi hua
+ *
+ *      agar minLen update nahi hua
  *          return ""
  *
  *      warna substring return karo
@@ -108,10 +80,10 @@
  * s = "ADOBECODEBANC"
  * t = "ABC"
  *
- * First valid window:
+ * first valid window:
  * "ADOBEC"
  *
- * Shrink karte hue better window milta hai:
+ * shrink karte hue better window milta hai:
  *
  * "BANC"
  *
@@ -121,88 +93,75 @@
  * ----------------------------------------------------
  * Why It Works:
  *
- * - Sliding window dynamic window maintain karta hai
- * - requiredCount ensure karta hai ki
- *   t ke saare characters present hain
- * - Window shrink karke minimum substring detect hota hai
+ * - Sliding window dynamic substring maintain karta hai
+ * - mapT required frequencies store karta hai
+ * - mapS current window track karta hai
+ * - contains() check karta hai ki window valid hai ya nahi
  *
  * ----------------------------------------------------
  * Time Complexity:
  *
- * O(n)
+ * Outer traversal: O(n)
  *
- * Har character maximum 2 times process hota hai
+ * contains() check: O(256)
+ *
+ * Total:
+ * O(256 * n) ≈ O(n)
  *
  * ----------------------------------------------------
  * Space Complexity:
  *
- * O(1)
- *
- * Frequency array size constant (128 ASCII)
+ * O(256)
  *
  * ----------------------------------------------------
  * Pattern:
- * Sliding Window + Frequency Counting
+ * Sliding Window + Frequency Arrays
  */
 
 class Solution {
 
     public String minWindow(String s, String t) {
 
-        if (t.length() > s.length()) return "";
+        int[] mapS = new int[256];
+        int[] mapT = new int[256];
 
-        int[] freq = new int[128];
-
-        // store frequency of characters in t
-        for (char c : t.toCharArray()) {
-            freq[c]++;
+        // Store frequency of characters in t
+        for (char ch : t.toCharArray()) {
+            mapT[ch]++;
         }
 
-        int requiredCount = t.length();
+        int left = 0, right = 0;
+        int minLen = Integer.MAX_VALUE;
+        int minStart = 0;
 
-        int i = 0, j = 0;
+        for (; right < s.length(); right++) {
 
-        int minWindowSize = Integer.MAX_VALUE;
-        int start = 0;
+            mapS[s.charAt(right)]++;
 
-        while (j < s.length()) {
+            while (contains(mapS, mapT)) {
 
-            char ch = s.charAt(j);
-
-            if (freq[ch] > 0) {
-                requiredCount--;
-            }
-
-            freq[ch]--;
-
-            // shrink window
-            while (requiredCount == 0) {
-
-                int windowSize = j - i + 1;
-
-                if (windowSize < minWindowSize) {
-                    minWindowSize = windowSize;
-                    start = i;
+                if (right - left + 1 < minLen) {
+                    minLen = right - left + 1;
+                    minStart = left;
                 }
 
-                char leftChar = s.charAt(i);
-
-                freq[leftChar]++;
-
-                if (freq[leftChar] > 0) {
-                    requiredCount++;
-                }
-
-                i++;
+                mapS[s.charAt(left++)]--;
             }
-
-            j++;
         }
 
-        if (minWindowSize == Integer.MAX_VALUE) {
-            return "";
+        return minLen == Integer.MAX_VALUE ? "" : s.substring(minStart, minStart + minLen);
+    }
+
+    // Function to check if current window satisfies requirement
+    private boolean contains(int[] mapS, int[] mapT) {
+
+        for (int i = 0; i < 256; i++) {
+
+            if (mapT[i] > mapS[i]) {
+                return false;
+            }
         }
 
-        return s.substring(start, start + minWindowSize);
+        return true;
     }
 }
