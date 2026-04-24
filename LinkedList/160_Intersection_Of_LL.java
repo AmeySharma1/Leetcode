@@ -102,3 +102,177 @@ public class Solution {
         return tempA; // intersection node or null
     }
 }
+
+
+/*
+ * Problem: 160. Intersection of Two Linked Lists
+ *
+ * Given:
+ * - Two singly linked lists
+ * - Need to find intersection node
+ *
+ * Definition:
+ * - Intersection means same memory reference
+ * - NOT same value
+ *
+ * -------------------------------------------------------
+ * Example:
+ *
+ * List A: 4 → 1
+ *               ↘
+ *                 8 → 4 → 5
+ *               ↗
+ * List B:    5 → 6 → 1
+ *
+ * Output:
+ * Node with value 8
+ *
+ * -------------------------------------------------------
+ * APPROACH 1: HashSet Method
+ *
+ * Idea:
+ * - Store all nodes of List A in HashSet
+ * - Traverse List B
+ * - First node already present in set = intersection
+ *
+ * -------------------------------------------------------
+ * Algorithm:
+ *
+ * 1. Traverse List A
+ *      Store each node in HashSet
+ *
+ * 2. Traverse List B
+ *      If node exists in HashSet:
+ *          return node
+ *
+ * 3. If no match found:
+ *      return null
+ *
+ * -------------------------------------------------------
+ * Time Complexity:
+ * O(n + m)
+ *
+ * Space Complexity:
+ * O(n)
+ *
+ * -------------------------------------------------------
+ * APPROACH 2: Length Difference Method
+ *
+ * Idea:
+ * - Find lengths of both lists
+ * - Move longer list ahead
+ * - Then move both together
+ * - First common node = intersection
+ *
+ * -------------------------------------------------------
+ * Why This Works:
+ *
+ * Example:
+ *
+ * List A length = 7
+ * List B length = 5
+ *
+ * Difference = 2
+ *
+ * Move List A ahead by 2 nodes
+ *
+ * Now both lists have equal remaining length
+ *
+ * -------------------------------------------------------
+ * Algorithm:
+ *
+ * 1. Find length of both lists
+ *
+ * 2. Move longer list forward:
+ *      until lengths become equal
+ *
+ * 3. Traverse both together:
+ *      if headA == headB
+ *          return node
+ *
+ * 4. Return null if not found
+ *
+ * -------------------------------------------------------
+ * Time Complexity:
+ * O(n + m)
+ *
+ * Space Complexity:
+ * O(1)
+ *
+ * -------------------------------------------------------
+ * Pattern:
+ * Linked List + Length Alignment
+ */
+
+public class Solution {
+
+    public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
+
+        int lenA = getListLength(headA);
+        int lenB = getListLength(headB);
+
+        // Align both lists
+        while (lenA > lenB) {
+            headA = headA.next;
+            lenA--;
+        }
+
+        while (lenB > lenA) {
+            headB = headB.next;
+            lenB--;
+        }
+
+        // Move together
+        while (headA != headB) {
+            headA = headA.next;
+            headB = headB.next;
+        }
+
+        return headA;
+    }
+
+    // Helper function to calculate length
+    public int getListLength(ListNode head) {
+
+        int length = 0;
+
+        while (head != null) {
+            length++;
+            head = head.next;
+        }
+
+        return length;
+    }
+}
+
+/*
+ * -------------------------------------------------------
+ * HASHSET VERSION
+ * -------------------------------------------------------
+ */
+
+class Solution_HashSet {
+
+    public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
+
+        HashSet<ListNode> set = new HashSet<>();
+
+        // Store List A nodes
+        while (headA != null) {
+            set.add(headA);
+            headA = headA.next;
+        }
+
+        // Check List B
+        while (headB != null) {
+
+            if (set.contains(headB)) {
+                return headB;
+            }
+
+            headB = headB.next;
+        }
+
+        return null;
+    }
+}
