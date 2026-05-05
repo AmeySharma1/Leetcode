@@ -92,31 +92,15 @@
  */
 
 class Solution {
-
-    public boolean isBalanced(TreeNode root) {
-
-        int height = height(root);
-
-        if (height == -1) return false;
-
-        return true;
+    public int height(TreeNode root){
+        if(root==null) return 0;
+        return 1+Math.max(height(root.left),height(root.right));
     }
-
-    public int height(TreeNode root) {
-
-        if (root == null) return 0;
-
-        int left_tree = height(root.left);
-        int right_tree = height(root.right);
-
-        if (left_tree == -1 || right_tree == -1) {
-            return -1;
-        }
-
-        if (Math.abs(left_tree - right_tree) > 1) {
-            return -1;
-        }
-
-        return 1 + Math.max(left_tree, right_tree);
+    public boolean isBalanced(TreeNode root) {
+        if(root==null) return true;
+        int h1 = height(root.left);
+        int h2 = height(root.right);
+        if(Math.abs(h1-h2)>1) return false;
+        return isBalanced(root.left) && isBalanced(root.right);
     }
 }
